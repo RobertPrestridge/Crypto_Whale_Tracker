@@ -1,0 +1,137 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin-bottom: 0;
+}
+
+.container {
+  flex: 1;
+}
+
+.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+  color: var(--bs-secondary-color);
+  text-align: end;
+}
+
+.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+  text-align: start;
+}
+
+/* Live Status Indicator - Pulsing Animation */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(25, 135, 84, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(25, 135, 84, 0);
+  }
+}
+
+.status-pulse {
+  animation: pulse 2s infinite;
+}
+
+/* Flash Animation for New Transactions */
+@keyframes flash {
+  0%, 100% {
+    background-color: transparent;
+  }
+  50% {
+    background-color: rgba(255, 193, 7, 0.3);
+  }
+}
+
+.transaction-flash {
+  animation: flash 1s ease-in-out;
+}
+
+/* Slide In Animation for New Rows */
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.transaction-new {
+  animation: slideIn 0.5s ease-out;
+  background-color: rgba(25, 135, 84, 0.1);
+}
+
+/* Connection Status Indicator styles are in retro-dark.css */
+
+/* Notification Counter Badge */
+.notification-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  background-color: #dc3545;
+  color: white;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  animation: scaleIn 0.3s ease-out;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* Live Indicator Dot */
+.live-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #198754;
+  margin-right: 5px;
+  animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.2);
+  }
+}

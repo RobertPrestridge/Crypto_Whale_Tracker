@@ -1,0 +1,159 @@
+@page
+@model InvestIt.Pages.Wallets.DetailsModel
+@using InvestIt.Helpers
+@{
+    ViewData["Title"] = "Wallet Details";
+}
+
+<div class="container-fluid">
+    @if (Model.Wallet != null)
+    {
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1 class="h2">Wallet Details</h1>
+                    <a href="/Wallets/List" class="btn btn-secondary">Back to List</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            @if (!string.IsNullOrEmpty(Model.Wallet.Label))
+                            {
+                                @Model.Wallet.Label
+                            }
+                            else
+                            {
+                                <text>Wallet Information</text>
+                            }
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <dl class="row">
+                                    <dt class="col-sm-4">Address:</dt>
+                                    <dd class="col-sm-8"><code>@Model.Wallet.Address</code></dd>
+
+                                    <dt class="col-sm-4">Network:</dt>
+                                    <dd class="col-sm-8">
+                                        <span class="badge bg-info">@Model.Wallet.BlockchainNetwork.Name</span>
+                                    </dd>
+
+                                    <dt class="col-sm-4">Status:</dt>
+                                    <dd class="col-sm-8">
+                                        @if (Model.Wallet.IsActive)
+                                        {
+                                            <span class="badge bg-success">Active</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Inactive</span>
+                                        }
+                                    </dd>
+                                </dl>
+                            </div>
+                            <div class="col-md-6">
+                                <dl class="row">
+                                    <dt class="col-sm-5">Total Transactions:</dt>
+                                    <dd class="col-sm-7">@Model.TotalTransactions</dd>
+
+                                    <dt class="col-sm-5">Last Checked:</dt>
+                                    <dd class="col-sm-7">
+                                        @if (Model.Wallet.LastCheckedAt.HasValue)
+                                        {
+                                            @TimeZoneHelper.FormatCentral(Model.Wallet.LastCheckedAt.Value)
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Never</span>
+                                        }
+                                    </dd>
+
+                                    <dt class="col-sm-5">Added:</dt>
+                                    <dd class="col-sm-7">@TimeZoneHelper.FormatCentral(Model.Wallet.CreatedAt)</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Transaction History</h5>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.Transactions.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>TX Hash</th>
+                                            <th>Type</th>
+                                            <th>Token</th>
+                                            <th>Amount</th>
+                                            <th>From</th>
+                                            <th>To</th>
+                                            <th>Timestamp</th>
+                                            <th>Block</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var tx in Model.Transactions)
+                                        {
+                                            var typeClass = tx.Type == TransactionType.Buy ? "text-success" :
+                                                           tx.Type == TransactionType.Sell ? "text-warning" : "text-info";
+                                            <tr>
+                                                <td>
+                                                    <code class="small">
+                                                        @(tx.TxHash.Length > 16 ? $"{tx.TxHash.Substring(0, 8)}...{tx.TxHash.Substring(tx.TxHash.Length - 6)}" : tx.TxHash)
+                                                    </code>
+                                                </td>
+                                                <td class="@typeClass"><strong>@tx.Type</strong></td>
+                                                <td>@tx.TokenSymbol</td>
+                                                <td>@tx.Amount.ToString("N4")</td>
+                                                <td>
+                                                    <code class="small">
+                                                        @(tx.FromAddress.Length > 12 ? $"{tx.FromAddress.Substring(0, 6)}...{tx.FromAddress.Substring(tx.FromAddress.Length - 4)}" : tx.FromAddress)
+                                                    </code>
+                                                </td>
+                                                <td>
+                                                    <code class="small">
+                                                        @(tx.ToAddress.Length > 12 ? $"{tx.ToAddress.Substring(0, 6)}...{tx.ToAddress.Substring(tx.ToAddress.Length - 4)}" : tx.ToAddress)
+                                                    </code>
+                                                </td>
+                                                <td><small>@TimeZoneHelper.FormatCentral(tx.Timestamp)</small></td>
+                                                <td>@tx.BlockNumber</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-info mb-0">
+                                No transactions recorded yet for this wallet.
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-danger">
+            Wallet not found.
+        </div>
+    }
+</div>

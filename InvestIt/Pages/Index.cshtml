@@ -1,0 +1,181 @@
+﻿@page
+@model IndexModel
+@using InvestIt.Helpers
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h2">
+                    Dashboard
+                    <span id="live-indicator" class="badge bg-success ms-2" style="display: none;">
+                        <span class="live-dot"></span>LIVE
+                    </span>
+                </h1>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="position-relative">
+                        <span class="badge bg-info">
+                            New Transactions: <span id="new-tx-count">0</span>
+                        </span>
+                    </div>
+                    <div>
+                        <span class="me-2">Connection:</span>
+                        <span id="signalr-status" class="badge status-connecting">Connecting...</span>
+                        <button id="test-signalr" class="btn btn-sm btn-outline-secondary ms-2" onclick="window.transactionHub?.sendTestNotification()" title="Send test notification">
+                            Test
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Total Wallets</h5>
+                    <p class="card-text display-6">@Model.TotalWallets</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Active Wallets</h5>
+                    <p class="card-text display-6">@Model.ActiveWallets</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h5 class="card-title">Transactions Today</h5>
+                    <p class="card-text display-6">@Model.TransactionsToday</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">Whale Transactions</h5>
+                    <p class="card-text display-6">@Model.WhaleTransactionCount</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monitoring Status -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Blockchain Network Status</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        @foreach (var status in Model.MonitoringStatuses)
+                        {
+                            <div class="col-md-3 mb-2">
+                                <div class="d-flex align-items-center">
+                                    <span class="badge @(status.IsHealthy ? "bg-success" : "bg-danger") me-2">
+                                        @(status.IsHealthy ? "✓" : "✗")
+                                    </span>
+                                    <div>
+                                        <strong>@status.Network.Name</strong><br>
+                                        <small class="text-muted">
+                                            @if (status.LastPollTime.HasValue)
+                                            {
+                                                <text>Last: @TimeZoneHelper.FormatCentral(status.LastPollTime.Value, "hh:mm:ss tt")</text>
+                                            }
+                                            else
+                                            {
+                                                <text>Never polled</text>
+                                            }
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Transactions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Recent Transactions</h5>
+                    <div class="d-flex gap-2 align-items-center">
+                        <div class="btn-group" role="group" aria-label="Transaction filters">
+                            <a href="/" class="btn btn-sm @(string.IsNullOrEmpty(Model.Filter) && string.IsNullOrEmpty(Model.Sort) ? "btn-primary" : "btn-outline-primary")">All</a>
+                            <a href="?sort=whales-first" class="btn btn-sm @(Model.Sort == "whales-first" ? "btn-primary" : "btn-outline-primary")">Whales First</a>
+                            <a href="?filter=whales" class="btn btn-sm @(Model.Filter == "whales" ? "btn-warning" : "btn-outline-warning")">Whales Only</a>
+                        </div>
+                        <a href="/Transactions/Recent" class="btn btn-sm btn-outline-secondary">View All</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (Model.RecentTransactions.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>TX Hash</th>
+                                        <th>Network</th>
+                                        <th>Type</th>
+                                        <th>Amount</th>
+                                        <th>Token</th>
+                                        <th>Timestamp</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="transactions-table-body">
+                                    @foreach (var tx in Model.RecentTransactions)
+                                    {
+                                        var typeClass = tx.Type == TransactionType.Buy ? "text-success" :
+                                                       tx.Type == TransactionType.Sell ? "text-warning" : "text-info";
+                                        var isWhale = tx.Wallet.Label?.Contains("Whale", StringComparison.OrdinalIgnoreCase) ?? false;
+                                        var rowClass = isWhale ? "whale-transaction" : "";
+                                        <tr class="@rowClass">
+                                            <td>
+                                                @if (isWhale)
+                                                {
+                                                    <span class="whale-badge" title="Whale Transaction over $10,000">🐋</span>
+                                                }
+                                                <code class="small">
+                                                    @(tx.TxHash.Length > 16 ? $"{tx.TxHash.Substring(0, 8)}...{tx.TxHash.Substring(tx.TxHash.Length - 6)}" : tx.TxHash)
+                                                </code>
+                                            </td>
+                                            <td>@tx.Wallet.BlockchainNetwork.Name</td>
+                                            <td class="@typeClass"><strong>@tx.Type</strong></td>
+                                            <td class="@(isWhale ? "fw-bold" : "")">@tx.Amount.ToString("N4")</td>
+                                            <td>@tx.TokenSymbol</td>
+                                            <td><small>@TimeZoneHelper.FormatCentral(tx.Timestamp)</small></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info mb-0">
+                            No transactions yet. Add wallets to start monitoring!
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container for Notifications -->
+<div id="toast-container" class="position-fixed top-0 end-0 p-3" style="z-index: 11"></div>

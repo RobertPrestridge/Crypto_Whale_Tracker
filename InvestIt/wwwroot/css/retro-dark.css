@@ -1,0 +1,850 @@
+/* ==============================================
+   RETRO DARK MODE THEME - InvestIt
+   Inspired by 80s/90s terminal aesthetics
+   ============================================== */
+
+/* Import retro-style monospace font */
+@import url('https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Courier+Prime:wght@400;700&display=swap');
+
+:root {
+    /* Retro Color Palette */
+    --retro-bg-primary: #0a0e27;
+    --retro-bg-secondary: #0f1419;
+    --retro-bg-tertiary: #1a1f2e;
+
+    /* Neon Accents */
+    --retro-cyan: #00ffff;
+    --retro-magenta: #ff00ff;
+    --retro-green: #00ff41;
+    --retro-amber: #ffb000;
+    --retro-red: #ff0055;
+    --retro-blue: #0080ff;
+
+    /* Terminal Green (phosphor) */
+    --retro-terminal-green: #33ff33;
+    --retro-terminal-dim: #1a8019;
+
+    /* Text */
+    --retro-text-primary: #00ff41;
+    --retro-text-secondary: #00ffff;
+    --retro-text-muted: #8aa8b8;
+    --retro-text-white: #e0e0e0;
+
+    /* Glows */
+    --retro-glow-cyan: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #00ffff;
+    --retro-glow-green: 0 0 10px #00ff41, 0 0 20px #00ff41, 0 0 30px #00ff41;
+    --retro-glow-magenta: 0 0 10px #ff00ff, 0 0 20px #ff00ff, 0 0 30px #ff00ff;
+    --retro-glow-amber: 0 0 10px #ffb000, 0 0 20px #ffb000;
+
+    /* Borders */
+    --retro-border: 2px solid var(--retro-cyan);
+    --retro-border-dim: 1px solid rgba(0, 255, 255, 0.3);
+}
+
+/* ==============================================
+   BASE STYLES
+   ============================================== */
+
+body {
+    background-color: var(--retro-bg-primary);
+    background-image:
+        repeating-linear-gradient(
+            0deg,
+            rgba(0, 255, 255, 0.03) 0px,
+            transparent 1px,
+            transparent 2px,
+            rgba(0, 255, 255, 0.03) 3px
+        ),
+        radial-gradient(circle at center, var(--retro-bg-primary) 0%, #000000 100%);
+    color: var(--retro-text-white);
+    font-family: 'Share Tech Mono', 'Courier Prime', 'Courier New', monospace;
+    position: relative;
+}
+
+/* CRT Screen Effect */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15),
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+    z-index: 9999;
+    animation: scanlines 8s linear infinite;
+}
+
+@keyframes scanlines {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(10px); }
+}
+
+/* Screen Flicker */
+@keyframes flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.98; }
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 255, 255, 0.02);
+    pointer-events: none;
+    z-index: 9998;
+    animation: flicker 0.15s infinite;
+}
+
+/* ==============================================
+   TYPOGRAPHY
+   ============================================== */
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'VT323', monospace;
+    color: var(--retro-cyan);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: var(--retro-glow-cyan);
+    font-weight: normal;
+}
+
+h1 { font-size: 3rem; }
+h2 { font-size: 2.5rem; }
+h3 { font-size: 2rem; }
+h4 { font-size: 1.5rem; }
+h5 { font-size: 1.25rem; }
+
+.display-4 {
+    font-family: 'VT323', monospace;
+    color: var(--retro-green);
+    text-shadow: var(--retro-glow-green);
+}
+
+.display-6 {
+    font-family: 'VT323', monospace;
+    font-size: 3rem !important;
+}
+
+/* ==============================================
+   NAVBAR
+   ============================================== */
+
+.navbar {
+    background: linear-gradient(180deg, var(--retro-bg-secondary) 0%, var(--retro-bg-primary) 100%) !important;
+    border-bottom: 2px solid var(--retro-cyan);
+    box-shadow: 0 4px 20px rgba(0, 255, 255, 0.3);
+    padding: 1rem 0;
+}
+
+.navbar-brand {
+    font-family: 'VT323', monospace;
+    font-size: 2rem;
+    color: var(--retro-cyan) !important;
+    text-shadow: var(--retro-glow-cyan);
+    letter-spacing: 3px;
+}
+
+.navbar-brand::before {
+    content: '◢';
+    margin-right: 10px;
+    animation: blink-triangle 2s infinite;
+}
+
+@keyframes blink-triangle {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0; }
+}
+
+.nav-link {
+    color: var(--retro-green) !important;
+    font-family: 'Share Tech Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.nav-link:hover {
+    color: var(--retro-cyan) !important;
+    text-shadow: var(--retro-glow-cyan);
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--retro-cyan);
+    box-shadow: var(--retro-glow-cyan);
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+/* ==============================================
+   CARDS
+   ============================================== */
+
+.card {
+    background: rgba(15, 20, 25, 0.8);
+    border: var(--retro-border);
+    border-radius: 0;
+    box-shadow:
+        0 0 20px rgba(0, 255, 255, 0.2),
+        inset 0 0 30px rgba(0, 255, 255, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(0, 255, 255, 0.1),
+        transparent
+    );
+    animation: card-scan 3s infinite;
+}
+
+@keyframes card-scan {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.card-header {
+    background: linear-gradient(180deg, rgba(0, 255, 255, 0.2) 0%, rgba(0, 255, 255, 0.1) 100%);
+    border-bottom: 1px solid var(--retro-cyan);
+    color: var(--retro-cyan);
+    font-family: 'VT323', monospace;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.card-body {
+    color: var(--retro-text-white);
+    background: #0a0e1a !important;
+}
+
+/* Table container in cards */
+.card-body .table-responsive {
+    background: #050810 !important;
+}
+
+/* Colored Cards */
+.card.text-white.bg-primary {
+    background: linear-gradient(135deg, #0080ff 0%, #0040ff 100%) !important;
+    border-color: #0080ff;
+    box-shadow: 0 0 20px rgba(0, 128, 255, 0.4);
+}
+
+.card.text-white.bg-success {
+    background: linear-gradient(135deg, #00ff41 0%, #00cc33 100%) !important;
+    border-color: #00ff41;
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
+}
+
+.card.text-white.bg-info {
+    background: linear-gradient(135deg, #00ffff 0%, #00cccc 100%) !important;
+    border-color: #00ffff;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+}
+
+.card.text-white.bg-warning {
+    background: linear-gradient(135deg, #ffb000 0%, #ff8800 100%) !important;
+    border-color: #ffb000;
+    box-shadow: 0 0 20px rgba(255, 176, 0, 0.4);
+}
+
+/* Stats cards - white text with shadow for readability */
+.card.text-white .card-title,
+.card.text-white .card-text {
+    color: #ffffff !important;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+}
+
+/* ==============================================
+   BADGES
+   ============================================== */
+
+.badge {
+    font-family: 'Share Tech Mono', monospace;
+    border-radius: 0;
+    padding: 0.5em 1em;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    border: 1px solid currentColor;
+}
+
+.badge.bg-primary {
+    background: #0080ff !important;
+    color: #fff;
+    box-shadow: 0 0 10px rgba(0, 128, 255, 0.5);
+}
+
+.badge.bg-success {
+    background: #00ff41 !important;
+    color: #000;
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+    font-weight: bold;
+}
+
+.badge.bg-info {
+    background: #00ffff !important;
+    color: #000;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    font-weight: bold;
+}
+
+.badge.bg-warning {
+    background: #ffb000 !important;
+    color: #000;
+    box-shadow: 0 0 10px rgba(255, 176, 0, 0.5);
+    font-weight: bold;
+}
+
+.badge.bg-danger {
+    background: #ff0055 !important;
+    color: #fff;
+    box-shadow: 0 0 10px rgba(255, 0, 85, 0.5);
+}
+
+.badge.bg-secondary {
+    background: rgba(90, 111, 122, 0.5) !important;
+    color: var(--retro-cyan);
+    border-color: var(--retro-cyan);
+}
+
+/* Status Badges with Pulse */
+.status-connected {
+    background: #00ff41 !important;
+    color: #000 !important;
+    animation: pulse-green 2s infinite;
+    font-weight: bold;
+}
+
+.status-connecting {
+    background: #ffb000 !important;
+    color: #000 !important;
+    animation: pulse-amber 2s infinite;
+    font-weight: bold;
+}
+
+.status-disconnected {
+    background: #ff0055 !important;
+    color: #fff !important;
+    font-weight: bold;
+}
+
+@keyframes pulse-green {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(0, 255, 65, 0.8), 0 0 30px rgba(0, 255, 65, 0.4);
+    }
+}
+
+@keyframes pulse-amber {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(255, 176, 0, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(255, 176, 0, 0.8), 0 0 30px rgba(255, 176, 0, 0.4);
+    }
+}
+
+/* ==============================================
+   TABLES
+   ============================================== */
+
+.table {
+    color: var(--retro-text-white);
+    font-family: 'Share Tech Mono', monospace;
+    border-collapse: separate;
+    border-spacing: 0;
+    background-color: #050810 !important;
+}
+
+.table thead th {
+    background: #0a1020 !important;
+    border-bottom: 2px solid var(--retro-cyan);
+    color: var(--retro-cyan);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: normal;
+    padding: 1rem;
+}
+
+.table thead {
+    background: #0a1020 !important;
+}
+
+.table tbody {
+    background: #050810 !important;
+}
+
+.table tbody tr {
+    background: #080c18 !important;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.15);
+    transition: all 0.3s ease;
+}
+
+.table tbody tr:nth-child(even) {
+    background: #0a0f1c !important;
+}
+
+.table tbody tr:hover {
+    background: #101828 !important;
+    box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.15);
+}
+
+.table tbody td {
+    padding: 0.75rem 1rem;
+    vertical-align: middle;
+    background: transparent !important;
+    border-color: rgba(0, 255, 255, 0.1) !important;
+}
+
+/* Override Bootstrap table-hover styles */
+.table-hover > tbody > tr:hover > * {
+    background: transparent !important;
+    --bs-table-bg-state: transparent !important;
+    --bs-table-accent-bg: transparent !important;
+}
+
+/* Amount and Timestamp columns - bright white */
+.table tbody td:nth-child(4),
+.table tbody td:nth-child(6),
+.table tbody td:nth-child(6) small {
+    color: #ffffff !important;
+}
+
+/* Code elements in tables */
+.table code {
+    background: rgba(0, 255, 65, 0.1);
+    border: 1px solid rgba(0, 255, 65, 0.3);
+    padding: 0.25rem 0.5rem;
+    color: var(--retro-green);
+    font-family: 'Courier Prime', monospace;
+}
+
+/* Transaction type colors */
+.text-success {
+    color: var(--retro-green) !important;
+    text-shadow: 0 0 5px rgba(0, 255, 65, 0.5);
+}
+
+.text-warning {
+    color: var(--retro-amber) !important;
+    text-shadow: 0 0 5px rgba(255, 176, 0, 0.5);
+}
+
+.text-info {
+    color: var(--retro-cyan) !important;
+    text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+}
+
+.text-danger {
+    color: var(--retro-red) !important;
+    text-shadow: 0 0 5px rgba(255, 0, 85, 0.5);
+}
+
+/* ==============================================
+   BUTTONS
+   ============================================== */
+
+.btn {
+    font-family: 'Share Tech Mono', monospace;
+    border-radius: 0;
+    border: 2px solid;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn-primary {
+    background: transparent;
+    border-color: var(--retro-cyan);
+    color: var(--retro-cyan);
+}
+
+.btn-primary:hover {
+    background: var(--retro-cyan);
+    color: #000;
+    box-shadow: var(--retro-glow-cyan);
+}
+
+.btn-success {
+    background: transparent;
+    border-color: var(--retro-green);
+    color: var(--retro-green);
+}
+
+.btn-success:hover {
+    background: var(--retro-green);
+    color: #000;
+    box-shadow: var(--retro-glow-green);
+}
+
+.btn-warning {
+    background: transparent;
+    border-color: var(--retro-amber);
+    color: var(--retro-amber);
+}
+
+.btn-warning:hover {
+    background: var(--retro-amber);
+    color: #000;
+    box-shadow: var(--retro-glow-amber);
+}
+
+.btn-danger {
+    background: transparent;
+    border-color: var(--retro-red);
+    color: var(--retro-red);
+}
+
+.btn-danger:hover {
+    background: var(--retro-red);
+    color: #fff;
+    box-shadow: 0 0 20px rgba(255, 0, 85, 0.5);
+}
+
+.btn-outline-primary {
+    border-color: var(--retro-cyan);
+    color: var(--retro-cyan);
+}
+
+.btn-outline-primary:hover {
+    background: var(--retro-cyan);
+    color: #000;
+}
+
+/* ==============================================
+   FORMS
+   ============================================== */
+
+.form-control,
+.form-select {
+    background: rgba(0, 255, 255, 0.05);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 0;
+    color: var(--retro-text-white);
+    font-family: 'Share Tech Mono', monospace;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    background: rgba(0, 255, 255, 0.1);
+    border-color: var(--retro-cyan);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+    color: var(--retro-text-white);
+}
+
+.form-label {
+    color: var(--retro-cyan);
+    font-family: 'Share Tech Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
+}
+
+/* ==============================================
+   ALERTS
+   ============================================== */
+
+.alert {
+    border-radius: 0;
+    border: 2px solid;
+    font-family: 'Share Tech Mono', monospace;
+}
+
+.alert-info {
+    background: rgba(0, 255, 255, 0.1);
+    border-color: var(--retro-cyan);
+    color: var(--retro-cyan);
+}
+
+.alert-success {
+    background: rgba(0, 255, 65, 0.1);
+    border-color: var(--retro-green);
+    color: var(--retro-green);
+}
+
+.alert-warning {
+    background: rgba(255, 176, 0, 0.1);
+    border-color: var(--retro-amber);
+    color: var(--retro-amber);
+}
+
+.alert-danger {
+    background: rgba(255, 0, 85, 0.1);
+    border-color: var(--retro-red);
+    color: var(--retro-red);
+}
+
+/* ==============================================
+   TOAST NOTIFICATIONS
+   ============================================== */
+
+.toast {
+    border-radius: 0;
+    border: 2px solid;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    font-family: 'Share Tech Mono', monospace;
+}
+
+.toast.bg-success {
+    background: rgba(0, 255, 65, 0.95) !important;
+    border-color: var(--retro-green);
+}
+
+.toast.bg-warning {
+    background: rgba(255, 176, 0, 0.95) !important;
+    border-color: var(--retro-amber);
+}
+
+.toast.bg-info {
+    background: rgba(0, 255, 255, 0.95) !important;
+    border-color: var(--retro-cyan);
+}
+
+/* ==============================================
+   LIVE INDICATOR
+   ============================================== */
+
+.live-dot {
+    width: 12px;
+    height: 12px;
+    background: var(--retro-green);
+    box-shadow:
+        0 0 10px var(--retro-green),
+        0 0 20px var(--retro-green),
+        0 0 30px var(--retro-green);
+    animation: pulse-dot-retro 1.5s infinite;
+}
+
+@keyframes pulse-dot-retro {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+        box-shadow:
+            0 0 10px var(--retro-green),
+            0 0 20px var(--retro-green),
+            0 0 30px var(--retro-green);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.3);
+        box-shadow:
+            0 0 20px var(--retro-green),
+            0 0 40px var(--retro-green),
+            0 0 60px var(--retro-green);
+    }
+}
+
+/* ==============================================
+   TEXT UTILITIES
+   ============================================== */
+
+.text-muted {
+    color: var(--retro-text-muted) !important;
+}
+
+small.text-muted {
+    color: var(--retro-text-muted) !important;
+    opacity: 0.9;
+}
+
+/* ==============================================
+   FOOTER
+   ============================================== */
+
+.footer {
+    background: var(--retro-bg-secondary);
+    border-top: 2px solid var(--retro-cyan);
+    color: var(--retro-text-muted);
+    font-family: 'Share Tech Mono', monospace;
+    padding: 1.5rem 0;
+    box-shadow: 0 -4px 20px rgba(0, 255, 255, 0.2);
+    margin-top: auto;
+}
+
+.footer a {
+    color: var(--retro-cyan);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.footer a:hover {
+    color: var(--retro-green);
+    text-shadow: var(--retro-glow-green);
+}
+
+/* ==============================================
+   CUSTOM RETRO ELEMENTS
+   ============================================== */
+
+/* Terminal-style scrollbar */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--retro-bg-primary);
+    border-left: 1px solid var(--retro-cyan);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--retro-cyan);
+    box-shadow: inset 0 0 6px rgba(0, 255, 255, 0.5);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--retro-green);
+}
+
+/* Grid Background Pattern */
+.retro-grid {
+    background-image:
+        linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+/* Corner Decorations */
+.retro-corner {
+    position: relative;
+}
+
+.retro-corner::before,
+.retro-corner::after {
+    content: '▸';
+    position: absolute;
+    color: var(--retro-cyan);
+    font-size: 1.5rem;
+    animation: blink 1s infinite;
+}
+
+.retro-corner::before {
+    top: -10px;
+    left: -10px;
+}
+
+.retro-corner::after {
+    bottom: -10px;
+    right: -10px;
+    transform: rotate(180deg);
+}
+
+/* ==============================================
+   WHALE TRANSACTION STYLES
+   ============================================== */
+
+.whale-transaction {
+    background: linear-gradient(90deg, 
+        rgba(255, 215, 0, 0.1) 0%, 
+        rgba(255, 215, 0, 0.05) 50%, 
+        rgba(255, 215, 0, 0.1) 100%);
+    border-left: 4px solid gold !important;
+    animation: whale-pulse 2s ease-in-out infinite;
+}
+
+@keyframes whale-pulse {
+    0%, 100% {
+        box-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.6), 0 0 30px rgba(255, 215, 0, 0.4);
+    }
+}
+
+.whale-badge {
+    font-size: 1.5rem;
+    margin-right: 8px;
+    display: inline-block;
+    animation: whale-swim 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8));
+}
+
+@keyframes whale-swim {
+    0%, 100% {
+        transform: translateY(0px) scale(1);
+    }
+    50% {
+        transform: translateY(-5px) scale(1.1);
+    }
+}
+
+.whale-transaction td {
+    font-weight: 500;
+    color: #ffd700 !important;
+}
+
+.whale-transaction code {
+    background: rgba(255, 215, 0, 0.2) !important;
+    color: #ffd700 !important;
+    border: 1px solid rgba(255, 215, 0, 0.5);
+}
+
+.whale-transaction .fw-bold {
+    color: #ffd700 !important;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+    font-size: 1.1rem;
+}
+
+/* Whale notification special styling */
+.whale-notification {
+    background: linear-gradient(135deg, #1a1a2e 0%, #2d1b00 100%);
+    border: 2px solid gold;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+.whale-notification .toast-header {
+    background: rgba(255, 215, 0, 0.2);
+    color: gold;
+    font-weight: bold;
+}
