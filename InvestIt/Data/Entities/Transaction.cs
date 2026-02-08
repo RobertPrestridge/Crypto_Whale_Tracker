@@ -10,6 +10,7 @@ public class Transaction
     public string? TokenSymbol { get; set; }
     public string? TokenAddress { get; set; }
     public decimal Amount { get; set; }
+    public decimal? AmountUsd { get; set; }
     public TransactionType Type { get; set; }
     public DateTime Timestamp { get; set; }
     public long BlockNumber { get; set; }

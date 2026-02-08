@@ -40,6 +40,7 @@ public class SignalRNotificationService : INotificationService
                 type = transaction.Type.ToString(),
                 tokenSymbol = transaction.TokenSymbol ?? "Unknown",
                 amount = transaction.Amount,
+                amountUsd = transaction.AmountUsd,
                 fromAddress = transaction.FromAddress ?? "",
                 toAddress = transaction.ToAddress ?? "",
                 timestamp = TimeZoneHelper.ToCentralTime(transaction.Timestamp),
@@ -79,6 +80,7 @@ public class SignalRNotificationService : INotificationService
             _ => "transferred"
         };
 
-        return $"Wallet {action} {transaction.Amount:N4} {transaction.TokenSymbol} on {transaction.Wallet?.BlockchainNetwork?.Name ?? "Unknown Network"}";
+        var usdPart = transaction.AmountUsd.HasValue ? $" (${transaction.AmountUsd.Value:N2} USD)" : "";
+        return $"Wallet {action} {transaction.Amount:N4} {transaction.TokenSymbol}{usdPart} on {transaction.Wallet?.BlockchainNetwork?.Name ?? "Unknown Network"}";
     }
 }

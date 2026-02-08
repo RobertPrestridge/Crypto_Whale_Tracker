@@ -61,6 +61,7 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.TokenSymbol).HasMaxLength(50);
             entity.Property(e => e.TokenAddress).HasMaxLength(255);
             entity.Property(e => e.Amount).HasPrecision(38, 18);
+            entity.Property(e => e.AmountUsd).HasPrecision(18, 2);
             entity.Property(e => e.GasUsed).HasPrecision(38, 18);
             entity.Property(e => e.GasPrice).HasPrecision(38, 18);
 
@@ -70,6 +71,7 @@ public class ApplicationDbContext : DbContext
             entity.HasIndex(e => e.TokenSymbol);
             entity.HasIndex(e => e.Timestamp);
             entity.HasIndex(e => e.Type);
+            entity.HasIndex(e => e.AmountUsd);
 
             entity.HasOne(e => e.Wallet)
                 .WithMany(w => w.Transactions)

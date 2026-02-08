@@ -112,7 +112,10 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Recent Transactions</h5>
+                    <h5 class="mb-0">
+                        Recent Transactions
+                        <small class="text-muted fw-normal ms-2">(above $@Model.MinAmountUsd.ToString("N0") USD)</small>
+                    </h5>
                     <div class="d-flex gap-2 align-items-center">
                         <div class="btn-group" role="group" aria-label="Transaction filters">
                             <a href="/" class="btn btn-sm @(string.IsNullOrEmpty(Model.Filter) && string.IsNullOrEmpty(Model.Sort) ? "btn-primary" : "btn-outline-primary")">All</a>
@@ -134,6 +137,7 @@
                                         <th>Type</th>
                                         <th>Amount</th>
                                         <th>Token</th>
+                                        <th>USD Value</th>
                                         <th>Timestamp</th>
                                     </tr>
                                 </thead>
@@ -142,13 +146,13 @@
                                     {
                                         var typeClass = tx.Type == TransactionType.Buy ? "text-success" :
                                                        tx.Type == TransactionType.Sell ? "text-warning" : "text-info";
-                                        var isWhale = tx.Wallet.Label?.Contains("Whale", StringComparison.OrdinalIgnoreCase) ?? false;
+                                        var isWhale = tx.AmountUsd.HasValue && tx.AmountUsd.Value >= Model.MinAmountUsd;
                                         var rowClass = isWhale ? "whale-transaction" : "";
                                         <tr class="@rowClass">
                                             <td>
                                                 @if (isWhale)
                                                 {
-                                                    <span class="whale-badge" title="Whale Transaction over $10,000">🐋</span>
+                                                    <span class="whale-badge" title="Whale Transaction over $@Model.MinAmountUsd.ToString("N0")">🐋</span>
                                                 }
                                                 <code class="small">
                                                     @(tx.TxHash.Length > 16 ? $"{tx.TxHash.Substring(0, 8)}...{tx.TxHash.Substring(tx.TxHash.Length - 6)}" : tx.TxHash)
@@ -156,8 +160,18 @@
                                             </td>
                                             <td>@tx.Wallet.BlockchainNetwork.Name</td>
                                             <td class="@typeClass"><strong>@tx.Type</strong></td>
-                                            <td class="@(isWhale ? "fw-bold" : "")">@tx.Amount.ToString("N4")</td>
+                                            <td>@tx.Amount.ToString("N4")</td>
                                             <td>@tx.TokenSymbol</td>
+                                            <td class="@(isWhale ? "fw-bold" : "")">
+                                                @if (tx.AmountUsd.HasValue)
+                                                {
+                                                    <text>$@tx.AmountUsd.Value.ToString("N2")</text>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">N/A</span>
+                                                }
+                                            </td>
                                             <td><small>@TimeZoneHelper.FormatCentral(tx.Timestamp)</small></td>
                                         </tr>
                                     }
@@ -168,7 +182,7 @@
                     else
                     {
                         <div class="alert alert-info mb-0">
-                            No transactions yet. Add wallets to start monitoring!
+                            No transactions above $@Model.MinAmountUsd.ToString("N0") USD yet. Add wallets to start monitoring!
                         </div>
                     }
                 </div>

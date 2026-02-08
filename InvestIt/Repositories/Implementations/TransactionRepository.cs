@@ -83,10 +83,10 @@ public class TransactionRepository : ITransactionRepository
         // Use FormattableString for raw SQL to avoid EF Core parameter type issues
         FormattableString sql = $@"
             INSERT INTO Transactions
-                (TxHash, WalletId, FromAddress, ToAddress, TokenSymbol, TokenAddress, Amount, Type, Timestamp, BlockNumber, GasUsed, GasPrice, RawData, CreatedAt)
+                (TxHash, WalletId, FromAddress, ToAddress, TokenSymbol, TokenAddress, Amount, AmountUsd, Type, Timestamp, BlockNumber, GasUsed, GasPrice, RawData, CreatedAt)
             VALUES
                 ({transaction.TxHash}, {transaction.WalletId}, {transaction.FromAddress}, {transaction.ToAddress},
-                 {transaction.TokenSymbol}, {transaction.TokenAddress}, {transaction.Amount}, {(int)transaction.Type},
+                 {transaction.TokenSymbol}, {transaction.TokenAddress}, {transaction.Amount}, {transaction.AmountUsd}, {(int)transaction.Type},
                  {transaction.Timestamp}, {transaction.BlockNumber}, {transaction.GasUsed}, {transaction.GasPrice},
                  {transaction.RawData}, {transaction.CreatedAt})";
 
@@ -107,6 +107,18 @@ public class TransactionRepository : ITransactionRepository
     public async Task<int> GetCountByWalletAsync(int walletId)
     {
         return await _context.Transactions.CountAsync(t => t.WalletId == walletId);
+    }
+
+    public async Task<IEnumerable<Transaction>> GetRecentAboveUsdAsync(decimal minAmountUsd, int count = 50)
+    {
+        return await _context.Transactions
+            .Include(t => t.Wallet)
+            .ThenInclude(w => w.BlockchainNetwork)
+            .Where(t => t.AmountUsd != null && t.AmountUsd >= minAmountUsd)
+            .OrderByDescending(t => t.Timestamp)
+            .Take(count)
+            .AsNoTracking()
+            .ToListAsync();
     }
 
     public async Task<IEnumerable<Transaction>> GetWhaleTransactionsAsync(int count = 50)
@@ -148,6 +160,13 @@ public class TransactionRepository : ITransactionRepository
     {
         return await _context.Transactions
             .Where(t => t.Wallet.Label != null && t.Wallet.Label.Contains("Whale"))
+            .CountAsync();
+    }
+
+    public async Task<int> GetWhaleTransactionCountByUsdAsync(decimal minAmountUsd)
+    {
+        return await _context.Transactions
+            .Where(t => t.AmountUsd != null && t.AmountUsd >= minAmountUsd)
             .CountAsync();
     }
 

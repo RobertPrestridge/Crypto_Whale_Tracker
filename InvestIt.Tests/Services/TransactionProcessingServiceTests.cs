@@ -4,6 +4,7 @@ using InvestIt.Data.Entities;
 using InvestIt.Repositories.Interfaces;
 using InvestIt.Services.ExplorerClients.Models;
 using InvestIt.Services.Interfaces;
+using InvestIt.Services.PriceTracking;
 using InvestIt.Services.Processing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -17,6 +18,7 @@ public class TransactionProcessingServiceTests : IDisposable
     private readonly ApplicationDbContext _context;
     private readonly Mock<ITransactionRepository> _mockTransactionRepo;
     private readonly Mock<INotificationQueueRepository> _mockNotificationRepo;
+    private readonly Mock<ICoinGeckoClient> _mockPriceClient;
     private readonly Mock<ILogger<TransactionProcessingService>> _mockLogger;
     private readonly TransactionProcessingService _service;
 
@@ -35,11 +37,18 @@ public class TransactionProcessingServiceTests : IDisposable
         // Setup mocks
         _mockTransactionRepo = new Mock<ITransactionRepository>();
         _mockNotificationRepo = new Mock<INotificationQueueRepository>();
+        _mockPriceClient = new Mock<ICoinGeckoClient>();
         _mockLogger = new Mock<ILogger<TransactionProcessingService>>();
+
+        // Default price mock: return $1 for any token
+        _mockPriceClient
+            .Setup(x => x.GetTokenPriceUsdAsync(It.IsAny<string>()))
+            .ReturnsAsync(1m);
 
         _service = new TransactionProcessingService(
             _mockTransactionRepo.Object,
             _mockNotificationRepo.Object,
+            _mockPriceClient.Object,
             _mockLogger.Object
         );
     }

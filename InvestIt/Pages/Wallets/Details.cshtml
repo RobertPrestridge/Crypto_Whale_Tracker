@@ -101,6 +101,7 @@
                                             <th>Type</th>
                                             <th>Token</th>
                                             <th>Amount</th>
+                                            <th>USD Value</th>
                                             <th>From</th>
                                             <th>To</th>
                                             <th>Timestamp</th>
@@ -121,6 +122,16 @@
                                                 <td class="@typeClass"><strong>@tx.Type</strong></td>
                                                 <td>@tx.TokenSymbol</td>
                                                 <td>@tx.Amount.ToString("N4")</td>
+                                                <td>
+                                                    @if (tx.AmountUsd.HasValue)
+                                                    {
+                                                        <text>$@tx.AmountUsd.Value.ToString("N2")</text>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">N/A</span>
+                                                    }
+                                                </td>
                                                 <td>
                                                     <code class="small">
                                                         @(tx.FromAddress.Length > 12 ? $"{tx.FromAddress.Substring(0, 6)}...{tx.FromAddress.Substring(tx.FromAddress.Length - 4)}" : tx.FromAddress)

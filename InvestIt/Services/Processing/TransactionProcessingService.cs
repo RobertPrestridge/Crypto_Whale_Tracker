@@ -2,6 +2,7 @@ using InvestIt.Data.Entities;
 using InvestIt.Repositories.Interfaces;
 using InvestIt.Services.ExplorerClients.Models;
 using InvestIt.Services.Interfaces;
+using InvestIt.Services.PriceTracking;
 using Microsoft.Extensions.Logging;
 
 namespace InvestIt.Services.Processing;
@@ -10,6 +11,7 @@ public class TransactionProcessingService : ITransactionProcessingService
 {
     private readonly ITransactionRepository _transactionRepository;
     private readonly INotificationQueueRepository _notificationRepository;
+    private readonly ICoinGeckoClient _priceClient;
     private readonly ILogger<TransactionProcessingService> _logger;
 
     // Max value - using a conservative limit to avoid any precision issues
@@ -22,10 +24,12 @@ public class TransactionProcessingService : ITransactionProcessingService
     public TransactionProcessingService(
         ITransactionRepository transactionRepository,
         INotificationQueueRepository notificationRepository,
+        ICoinGeckoClient priceClient,
         ILogger<TransactionProcessingService> logger)
     {
         _transactionRepository = transactionRepository;
         _notificationRepository = notificationRepository;
+        _priceClient = priceClient;
         _logger = logger;
     }
 
@@ -97,12 +101,17 @@ public class TransactionProcessingService : ITransactionProcessingService
             // Process and classify transaction
             var transaction = ProcessTransaction(blockchainTx, walletId, monitoredWalletAddress);
 
+            // Calculate USD value
+            transaction.AmountUsd = await CalculateAmountUsdAsync(
+                transaction.TokenSymbol ?? "ETH", transaction.Amount);
+
             // Store transaction
             var storedTransaction = await _transactionRepository.AddAsync(transaction);
 
             _logger.LogInformation(
-                "Processed {Type} transaction {TxHash} for wallet {WalletId}: {Amount} {Symbol}",
-                transaction.Type, transaction.TxHash, walletId, transaction.Amount, transaction.TokenSymbol);
+                "Processed {Type} transaction {TxHash} for wallet {WalletId}: {Amount} {Symbol} (${AmountUsd:N2} USD)",
+                transaction.Type, transaction.TxHash, walletId, transaction.Amount, transaction.TokenSymbol,
+                transaction.AmountUsd ?? 0);
 
             // Queue notification
             await QueueNotificationAsync(storedTransaction.Id);
@@ -114,6 +123,23 @@ public class TransactionProcessingService : ITransactionProcessingService
             _logger.LogError(ex, "Error processing transaction {TxHash}", blockchainTx.TxHash);
             return null;
         }
+    }
+
+    private async Task<decimal?> CalculateAmountUsdAsync(string tokenSymbol, decimal amount)
+    {
+        try
+        {
+            var price = await _priceClient.GetTokenPriceUsdAsync(tokenSymbol);
+            if (price.HasValue)
+            {
+                return Math.Round(amount * price.Value, 2);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to fetch USD price for {Token}, AmountUsd will be null", tokenSymbol);
+        }
+        return null;
     }
 
     private TransactionType ClassifyTransaction(BlockchainTransaction tx, string monitoredWalletAddress)

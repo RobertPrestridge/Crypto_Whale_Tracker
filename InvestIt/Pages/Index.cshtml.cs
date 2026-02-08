@@ -11,15 +11,18 @@ namespace InvestIt.Pages
         private readonly ITransactionRepository _transactionRepository;
         private readonly IWalletRepository _walletRepository;
         private readonly IMonitoringStatusRepository _monitoringStatusRepository;
+        private readonly IConfiguration _configuration;
 
         public IndexModel(
             ITransactionRepository transactionRepository,
             IWalletRepository walletRepository,
-            IMonitoringStatusRepository monitoringStatusRepository)
+            IMonitoringStatusRepository monitoringStatusRepository,
+            IConfiguration configuration)
         {
             _transactionRepository = transactionRepository;
             _walletRepository = walletRepository;
             _monitoringStatusRepository = monitoringStatusRepository;
+            _configuration = configuration;
         }
 
         public IEnumerable<Transaction> RecentTransactions { get; set; } = new List<Transaction>();
@@ -27,6 +30,7 @@ namespace InvestIt.Pages
         public int ActiveWallets { get; set; }
         public int TransactionsToday { get; set; }
         public int WhaleTransactionCount { get; set; }
+        public decimal MinAmountUsd { get; set; }
         public IEnumerable<MonitoringStatus> MonitoringStatuses { get; set; } = new List<MonitoringStatus>();
 
         [BindProperty(SupportsGet = true)]
@@ -37,18 +41,21 @@ namespace InvestIt.Pages
 
         public async Task OnGetAsync()
         {
-            // Get transactions based on filter/sort
+            var maxDisplay = _configuration.GetValue<int>("DashboardSettings:MaxTransactionsDisplayed", 50);
+            MinAmountUsd = _configuration.GetValue<decimal>("DashboardSettings:MinAmountUsd", 10000);
+
+            // All dashboard views filter to transactions >= $10,000 USD
             if (Filter == "whales")
             {
-                RecentTransactions = await _transactionRepository.GetWhaleTransactionsAsync(50);
+                RecentTransactions = await _transactionRepository.GetWhaleTransactionsAsync(maxDisplay);
             }
             else if (Sort == "whales-first")
             {
-                RecentTransactions = await _transactionRepository.GetRecentWithWhalePriorityAsync(50);
+                RecentTransactions = await _transactionRepository.GetRecentWithWhalePriorityAsync(maxDisplay);
             }
             else
             {
-                RecentTransactions = await _transactionRepository.GetRecentAsync(50);
+                RecentTransactions = await _transactionRepository.GetRecentAboveUsdAsync(MinAmountUsd, maxDisplay);
             }
 
             var allWallets = await _walletRepository.GetAllAsync();
@@ -57,7 +64,7 @@ namespace InvestIt.Pages
 
             TransactionsToday = await _transactionRepository.GetTransactionCountByDateAsync(TimeZoneHelper.GetCentralToday());
 
-            WhaleTransactionCount = await _transactionRepository.GetWhaleTransactionCountAsync();
+            WhaleTransactionCount = await _transactionRepository.GetWhaleTransactionCountByUsdAsync(MinAmountUsd);
 
             MonitoringStatuses = await _monitoringStatusRepository.GetAllAsync();
         }

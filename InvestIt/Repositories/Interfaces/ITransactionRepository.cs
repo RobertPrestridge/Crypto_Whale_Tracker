@@ -10,11 +10,13 @@ public interface ITransactionRepository
     Task<IEnumerable<Transaction>> GetByWalletAsync(int walletId, int skip = 0, int take = 50);
     Task<IEnumerable<Transaction>> GetByTokenSymbolAsync(string tokenSymbol, int skip = 0, int take = 50);
     Task<IEnumerable<Transaction>> GetByTypeAsync(TransactionType type, int skip = 0, int take = 50);
+    Task<IEnumerable<Transaction>> GetRecentAboveUsdAsync(decimal minAmountUsd, int count = 50);
     Task<IEnumerable<Transaction>> GetWhaleTransactionsAsync(int count = 50);
     Task<IEnumerable<Transaction>> GetRecentWithWhalePriorityAsync(int count = 50);
     Task<Transaction> AddAsync(Transaction transaction);
     Task<bool> ExistsByHashAsync(string txHash);
     Task<int> GetCountByWalletAsync(int walletId);
     Task<int> GetWhaleTransactionCountAsync();
+    Task<int> GetWhaleTransactionCountByUsdAsync(decimal minAmountUsd);
     Task<int> GetTransactionCountByDateAsync(DateTime date);
 }
