@@ -193,7 +193,7 @@ publish/
 # ==============================================
 # Documentation / Markdown
 # ==============================================
-*.md
+# Note: CLAUDE.md and README.md are tracked; add specific excludes if needed
 
 # ==============================================
 # Misc
